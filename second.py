@@ -104,7 +104,7 @@ async def main():
             if user_input.lower() in ['exit', 'quit']: break
             if not user_input.strip(): continue
 
-            final_report = await workspace_bot.execute(user_message=user_input, max_iterations=7)
+            final_report = await workspace_bot.execute(user_message=user_input)
             print(f"\n🎯 [Agent Response]:\n{final_report}")
         except (KeyboardInterrupt, EOFError):
             print("\n👋 Goodbye!")

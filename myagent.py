@@ -187,7 +187,7 @@ class Agent:
         ]
         print("🧹 [Memory Guard] Compression finalized.")
 
-    async def execute(self, user_message: str, max_iterations: int = 5, max_tokens: int = 20000, max_seconds: float = 30.0, reset_memory: bool = False) -> str:
+    async def execute(self, user_message: str, max_iterations: int = 50, max_tokens: int = 1000000, max_seconds: float = 3600.0, reset_memory: bool = False) -> str:
         """Runs the ReAct loop tracking active execution times, token budgets and iteration scales."""
         print(f"\n🚀 [Agent] Starting self-regulating task: '{user_message}'")
         

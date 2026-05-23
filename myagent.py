@@ -61,9 +61,10 @@ class Agent:
         self.system_prompt = system_prompt
         self.memory: List[Dict[str, Any]] = []
         
-        # Token consumption tracking counters
+        # Performance and budget tracking
         self.total_prompt_tokens = 0
         self.total_completion_tokens = 0
+        self.total_wait_time = 0.0 # Time spent waiting for human input
         
         # Configuration setup fetched from environment
         self.client = OpenAI(
@@ -82,13 +83,22 @@ class Agent:
             print(f"[Agent] Registered tool: {name} (Consent: {requires_consent})")
 
     async def ask_user_permission(self, tool_name: str, args: Dict[str, Any]) -> bool:
-        """Helper function to prompt the user for confirmation in the terminal."""
+        """Helper function to prompt the user for confirmation in the terminal, tracking wait time."""
         print(f"\n⚠️  [PERMISSION REQUIRED] The agent wants to execute: '{tool_name}' with args: {args}")
         loop = asyncio.get_running_loop()
-        user_response = await loop.run_in_executor(
-            None, 
-            lambda: input("Allow this action? (y/n): ").strip().lower()
-        )
+        
+        wait_start = time.time()
+        try:
+            user_response = await loop.run_in_executor(
+                None, 
+                lambda: input("Allow this action? (y/n): ").strip().lower()
+            )
+        except (KeyboardInterrupt, EOFError):
+            print("\n❌ Permission denied due to user interruption.")
+            return False
+        finally:
+            self.total_wait_time += (time.time() - wait_start)
+            
         return user_response in ['y', 'yes']
 
     async def _execute_single_tool(self, tool_call) -> Dict[str, Any]:
@@ -184,6 +194,7 @@ class Agent:
         start_time = time.time()
         self.total_prompt_tokens = 0
         self.total_completion_tokens = 0
+        self.total_wait_time = 0.0 # Reset wait time for each task
         
         if reset_memory or not self.memory:
             self.memory = [{"role": "system", "content": self.system_prompt}]
@@ -191,10 +202,11 @@ class Agent:
         self.memory.append({"role": "user", "content": user_message})
 
         for iteration in range(1, max_iterations + 1):
-            elapsed_time = time.time() - start_time
+            # Calculate elapsed time excluding wait time
+            elapsed_time = (time.time() - start_time) - self.total_wait_time
             accumulated_tokens = self.total_prompt_tokens + self.total_completion_tokens
             
-            print(f"\n--- [Loop Check] Iteration {iteration}/{max_iterations} | Time: {elapsed_time:.1f}s/{max_seconds}s | Tokens: {accumulated_tokens}/{max_tokens} ---")
+            print(f"\n--- [Loop Check] Iteration {iteration}/{max_iterations} | Active Time: {elapsed_time:.1f}s/{max_seconds}s | Tokens: {accumulated_tokens}/{max_tokens} ---")
 
             # Boundary safety guards check
             if elapsed_time >= max_seconds:

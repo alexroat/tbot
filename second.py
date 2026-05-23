@@ -106,8 +106,11 @@ async def main():
 
             final_report = await workspace_bot.execute(user_message=user_input, max_iterations=7)
             print(f"\n🎯 [Agent Response]:\n{final_report}")
-        except KeyboardInterrupt: break
-        except Exception as e: print(f"❌ Error during execution: {e}")
+        except (KeyboardInterrupt, EOFError):
+            print("\n👋 Goodbye!")
+            break
+        except Exception as e:
+            print(f"❌ Error during execution: {e}")
 
 if __name__ == "__main__":
     asyncio.run(main())

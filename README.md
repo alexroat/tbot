@@ -1,74 +1,78 @@
-# Autonomous AI Agent (tbot)
+# TBot
 
-This project implements an autonomous AI agent in Python that can interact with the local file system and execute shell commands. It uses a modular tool-based approach to perform actions directly (e.g., reading/writing files, running commands) rather than merely describing them. The agent is defined in `myagent.py`, and the main entrypoint script is `second.py`.
+TBot is an autonomous AI agent framework and associated tooling designed for experimentation with agent-based file system and shell command interactions. This repository includes:
 
-## Features
+- **myagent.py**: A tool-based AI agent with built-in safety checks, consent handling, and memory compression. It can interact with local files and execute shell commands based on defined tools.
+- **second.py**: A command-line interface (CLI) utility exposing core file operations (list, read, write, delete) and shell command execution. Useful for manual or scripted file-system interactions.
+- **get_quotes.py**: A small script to fetch random quotes from a local `quotes.csv` database.
+- **quotes.csv**: A CSV file containing sample quotes used by `get_quotes.py`.
+- **.env**: Environment variable definitions (e.g., API keys or configuration). Make sure to set up required variables before running scripts.
+- **requirements.txt**: Python dependencies needed for the project.
 
-- **Tool Registration and Schema Generation**: Automatically generates JSON schemas for tools based on Python function signatures (`myagent.py`).
-- **User Consent Workflow**: Prompts the user for permission before executing potentially destructive tools (write, delete, shell commands).
-- **Built-in Tools**: 
-  - list_directory_contents  – Lists files and directories.
-  - read_file_content       – Reads and returns file contents.
-  - write_file_content      – Creates or overwrites files.
-  - delete_file             – Deletes files.
-  - run_shell_command       – Executes arbitrary shell commands.
-- **Safety and Budget Guards**: Enforces time, token, and iteration limits on agent executions, with automatic memory compression.
-- **Interactive CLI**: Launch an interactive session to issue natural-language commands to the agent.
+## Setup
 
-## Installation
-
-1. Clone the repository:
+1. Clone this repository:
 
    ```bash
-   git clone git@github.com:alexroat/tbot.git
+   git clone <repo-url>
    cd tbot
    ```
-2. (Optional) Create and activate a virtual environment:
+
+2. Create and activate a virtual environment:
 
    ```bash
    python3 -m venv venv
-   source venv/bin/activate
+   source venv/bin/activate   # macOS/Linux
+   venv\Scripts\activate      # Windows
    ```
+
 3. Install dependencies:
 
    ```bash
    pip install -r requirements.txt
    ```
-4. Create a `.env` file in the project root with the following variables:
 
-   ```ini
-   LLM_API_KEY=your_openai_api_key
-   LLM_PROVIDER_URL=https://api.openai.com/v1
-   LLM_MODEL_NAME=o4-mini
+4. Configure environment variables:
+
+   Copy `.env.example` to `.env` and update values:
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your preferred editor
    ```
 
 ## Usage
 
-Run the main agent script:
+### Run the AI Agent
 
 ```bash
-python second.py
+python myagent.py
 ```
 
-- The agent will register its tools and start an interactive REPL.
-- Type natural-language commands (e.g., "Create a file named example.txt with content 'Hello'"), and the agent will perform the appropriate actions.
-- To exit, type `exit` or `quit`.
+This launches an interactive REPL allowing you to send instructions to the AI agent, which can then perform file operations or shell commands.
 
-## Project Structure
+### CLI File & Shell Utility
 
+Use `second.py` for quick file system operations:
+
+- List files:  `python second.py list`
+- Read file:   `python second.py read <file_path>`
+- Write file:  `python second.py write <file_path> <content>`
+- Delete file: `python second.py delete <file_path>`
+- Shell exec:  `python second.py shell <command>`
+
+### Fetch Random Quotes
+
+```bash
+python get_quotes.py
 ```
-├── myagent.py        # Core Agent implementation & tool management
-├── second.py         # Main CLI entrypoint and tool definitions
-├── requirements.txt  # Python dependencies
-├── .env              # Environment variables (not committed)
-├── README.md         # Project documentation
-└── ...               # Other supporting files
-```
+
+Prints a random quote from `quotes.csv`.
 
 ## Contributing
 
-Contributions welcome! Please open issues or pull requests for new features or bug fixes.
+Contributions are welcome! Feel free to open issues or pull requests.
 
 ## License
 
-MIT License
+This project is licensed under the MIT License.

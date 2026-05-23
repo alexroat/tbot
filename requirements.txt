@@ -1,0 +1,6 @@
+langgraph
+langchain-ollama
+chromadb
+yfinance
+pydantic
+pandas

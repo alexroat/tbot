@@ -1,0 +1,13 @@
+# Ignore CSV files
+*.csv
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+env/
+venv/
+
+# Environment variables
+.env
